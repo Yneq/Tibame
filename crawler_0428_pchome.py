@@ -26,7 +26,14 @@ for link in links:
     product_resp = req.urlopen(link_href)
     product_html = bs.BeautifulSoup(product_resp.read())
     product_name = product_html.find("h1", {"class":"o-prodMainName__grayDarkest"})
-    
+
+    # 產品品牌
+    product_brand = product_html.find("span", {"class":"o-prodMainName__colorSecondary"})
+    if product_brand:
+        product_brand = product_brand.text.strip()
+    else:
+        product_brand = "-"
+
     # 修正價格的 class 名稱
     current_price = None
     original_price = None
@@ -80,6 +87,7 @@ for link in links:
     # 將商品資料加入列表
     product_data = {
         "商品名稱": product_name.text.strip() if product_name else "-",
+        "品牌": product_brand,
         "原價": original_price.text.strip() if original_price else "-",
         "目前售價": current_price.text.strip() if current_price else "-",
         "滿額贈": free_gift_text,
@@ -92,6 +100,7 @@ for link in links:
 
     # 印出當前商品資訊
     print("商品名稱:", product_data["商品名稱"])
+    print("品牌:", product_data["品牌"])
     print("原價:", product_data["原價"])
     print("目前售價:", product_data["目前售價"])
     print("滿額贈:", product_data["滿額贈"])
