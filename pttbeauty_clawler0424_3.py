@@ -4,6 +4,8 @@ import json
 import urllib.request as req
 import bs4 as bs
 import ssl
+import glob
+import pandas as pd
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -92,20 +94,34 @@ def get_img(url):
                 f.write(img.read())
 
 
-
 url = "https://www.ptt.cc/bbs/Beauty/index4002.html"
 r = req.Request(url)
 r.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/10")
 resp = req.urlopen(r)
 html = bs.BeautifulSoup(resp.read())
-    
-# 找出所有文章連結
-for entry in html.find_all("div", {"class": "r-ent"}):
-    link = entry.find("a")
-    if link != None:
-        article_url = "https://www.ptt.cc" + link["href"]
-        get_img(article_url)
-        get_meta(article_url)
 
+# post_list = html.find_all("div", {"class":"title"})
+# for post in post_list:
+#     post_link = post.find("a")
+#     if not post_link == None:
+#         post_url = "https://www.ptt.cc" + post_link["href"]
+#         get_img(post_url)
+#         get_meta(post_url)
 
+table = []
+for fn in glob.glob("M.*.json"):
+    with open(fn, "r", encoding="utf-8") as f:
+        content = f.read()
+    post = json.loads(content)
+    table.append(post)
+df = pd.json_normalize(table)
+# print(df)
 
+# 1. filter(過濾): 帶入跟你資料筆數依樣多的True/False
+# 2. apply(轉換): apply(轉換函式)
+def trans(s):
+    # s = "willy911006 (小溫)	"
+    return s.split("(")[0].strip()
+
+df["pttid"] = df["作者"].apply(trans)
+print(df["pttid"])
