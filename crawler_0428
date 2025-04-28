@@ -1,0 +1,53 @@
+import bs4 as bs
+# from...import: 他比普通import可以更深入一點, 直接import功能名字
+url = "https://www.ptt.cc/bbs/Beauty/M.1745216140.A.52E.html"
+
+     
+
+# 內建urllib
+import urllib.request as req
+r = req.Request(url)
+r.add_header("User-Agent", "xxxxx")
+resp = req.urlopen(r)
+content = resp.read()
+bs.BeautifulSoup(content)
+     
+
+# 第三方requests
+import requests
+h = {
+    "User-Agent": "xxxxx"
+}
+# open->get
+resp = requests.get(url, headers=h)
+# read
+content = resp.text
+bs.BeautifulSoup(content)
+# resp.request.headers
+# resp.headers
+     
+
+# 如果不用加headers, 首選當然是urllib.request裡的urlretrieve
+url = "https://i.imgur.com/KybCapc.jpeg"
+     
+
+import urllib.request as req
+r = req.Request(url)
+r.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36")
+resp = req.urlopen(r)
+
+content = resp.read()
+with open("a.jpeg", "wb") as f:
+    f.write(content)
+     
+
+import requests
+h = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
+}
+# !!! 如果你要開的網址你很確認是非純文字(stream=True)
+resp = requests.get(url, headers=h, stream=True)
+# 如果你給出stream=True, 就不會幫你讀到.text裡, 會幫你在.raw維持一個檔案的樣子
+content = resp.raw.read()
+with open("b.jpeg", "wb") as f:
+    f.write(content)
