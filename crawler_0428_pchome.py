@@ -110,8 +110,16 @@ for link in links:
     print("圖片網址:", product_data["圖片網址"])
     print("-" * 50)
 
-# 使用 pandas 處理資料
-df = pd.DataFrame(all_products)
+# 將資料包裝成類似 API 回傳的格式
+pchome_data = {
+    "data": {
+        "products": all_products
+    }
+}
+
+# 取出商品資料並轉換成 DataFrame
+products = pchome_data["data"]["products"]
+df = pd.json_normalize(products)
 
 # 基本資料處理
 print("\n基本統計資訊:")
